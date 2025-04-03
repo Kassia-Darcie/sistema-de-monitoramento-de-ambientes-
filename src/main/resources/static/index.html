@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Sensor WebSocket</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.2/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .data-box { border: 1px solid #ccc; padding: 15px; margin: 10px 0; }
+        .status { color: #666; font-size: 0.9em; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Monitor de Sensor em Tempo Real</h2>
+
+    <div>
+        <button onclick="connect()">Conectar</button>
+        <button onclick="disconnect()">Desconectar</button>
+        <button onclick="simulateSend()">Simular Envio</button>
+    </div>
+
+    <div class="status" id="status">Status: Desconectado</div>
+
+    <div class="data-box">
+        <h3>Última Leitura:</h3>
+        <pre id="output"></pre>
+    </div>
+</div>
+
+<script>
+    let stompClient = null;
+    const statusElement = document.getElementById('status');
+    const outputElement = document.getElementById('output');
+
+    function updateStatus(message) {
+        statusElement.innerHTML = `Status: ${message}`;
+    }
+
+    function connect() {
+        const socket = new SockJS('http://localhost:8080/ws-sensor');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, (frame) => {
+            updateStatus(`Conectado: ${frame.headers['server']}`);
+
+            // Subscribe para o tópico de dados
+            stompClient.subscribe('/topic/sensor-data', (message) => {
+                const data = JSON.parse(message.body);
+                outputElement.textContent = JSON.stringify(data, null, 2);
+            });
+
+        }, (error) => {
+            updateStatus(`Erro na conexão: ${error}`);
+            console.error(error);
+        });
+    }
+
+    function disconnect() {
+        if (stompClient !== null) {
+            stompClient.disconnect(() => {
+                updateStatus('Desconectado');
+                outputElement.textContent = '';
+            });
+        }
+    }
+
+    // Função para simular envio de comandos (opcional)
+    function simulateSend() {
+        if (stompClient && stompClient.connected) {
+            const mockData = {
+                temperatura: (Math.random() * 30 + 20).toFixed(1),
+                umidade: (Math.random() * 50 + 30).toFixed(1)
+            };
+            stompClient.send("/app/sensor-command", {}, JSON.stringify(mockData));
+        }
+    }
+
+    // Conexão automática ao carregar
+    window.onload = () => {
+        // connect(); // Descomente para auto-conexão
+    };
+</script>
+</body>
+</html>
