@@ -1,20 +1,33 @@
 package com.pi_v_b.sistema_de_monitoramento_de_ambientes.controller;
 
 import com.pi_v_b.sistema_de_monitoramento_de_ambientes.dto.SensorData;
+import com.pi_v_b.sistema_de_monitoramento_de_ambientes.service.SensorService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
+
 @Controller
+@RequiredArgsConstructor
 public class SensorController {
 
-    @Autowired
-    private SimpMessagingTemplate messageTemplate;
+    private final SimpMessagingTemplate messageTemplate;
+    private final SensorService sensorService;
 
-    public void sendSensorData(double umidade, double temperatura, double luminosidade) {
+    @Scheduled(fixedRate = 2000)
+    public void sendSensorData() {
         String destination = "/topic/sensor-data";
-        SensorData sensorData = new SensorData(umidade, temperatura, luminosidade);
+        SensorData sensorData = this.sensorService.getSensorData();
 
         messageTemplate.convertAndSend(destination, sensorData);
+
+        List<String> alerts = this.sensorService.checkAlerts();
+        if (!alerts.isEmpty()) {
+            String alertDestination = "/topic/alerts";
+            messageTemplate.convertAndSend(alertDestination, alerts);
+        }
     }
 }
