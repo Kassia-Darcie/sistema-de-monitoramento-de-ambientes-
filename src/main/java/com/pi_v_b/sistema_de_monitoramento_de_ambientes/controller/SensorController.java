@@ -14,6 +14,7 @@ public class SensorController {
     public void sendSensorData(double umidade, double temperatura, double luminosidade) {
         String destination = "/topic/sensor-data";
         SensorData sensorData = new SensorData(umidade, temperatura, luminosidade);
+
         messageTemplate.convertAndSend(destination, sensorData);
     }
 }
