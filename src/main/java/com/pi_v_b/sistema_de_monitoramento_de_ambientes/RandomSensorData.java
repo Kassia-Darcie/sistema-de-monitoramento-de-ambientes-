@@ -2,7 +2,6 @@ package com.pi_v_b.sistema_de_monitoramento_de_ambientes;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;

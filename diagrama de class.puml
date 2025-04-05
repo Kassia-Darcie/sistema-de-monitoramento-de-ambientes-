@@ -1,0 +1,74 @@
+@startuml
+'-----------------------------------------
+' Entidades Principais
+'-----------------------------------------
+
+
+class SensorData {
+  - Double umidade
+  - Double temperatura
+  - Double luminosidade
+  + getters/setters()
+}
+
+class SensorService {
+  - SensorData sensorData
+  + processSensorData(String rawData)
+  + checkAlerts(): List<String>
+}
+
+class RandomSensorData {
+  - Consumer<String> dataConsumer
+  + generateRandomData() <<@Scheduled>>
+}
+
+interface ArduinoReader {
+  + start()
+}
+
+'-----------------------------------------
+' Componentes Spring
+'-----------------------------------------
+class SensorController <<@Controller>> {
+  - SimpMessagingTemplate messageTemplate
+  - SensorService sensorService
+  + sendSensorData() <<@Scheduled>>
+}
+
+class WebSocketConfig <<@Configuration>> {
+  + configureMessageBroker()
+  + registerStompEndpoints()
+}
+
+class ArduinoReaderConfig <<@Configuration>> {
+  + arduinoReader(): ArduinoReader
+}
+
+'-----------------------------------------
+' Relacionamentos
+'-----------------------------------------
+ArduinoReader <|.. RandomSensorData
+RandomSensorData --> SensorService : uses (dataConsumer)
+SensorService "1" *-- "1" SensorData : contains
+
+SensorController --> SensorService : dependency
+SensorController --> SimpMessagingTemplate : dependency
+
+ArduinoReaderConfig ..> SensorService : injects
+ArduinoReaderConfig ..> RandomSensorData : creates
+
+'-----------------------------------------
+' Notas Adicionais
+'-----------------------------------------
+note top of RandomSensorData
+  Gera dados simulados a cada 2s
+  usando @Scheduled
+end note
+
+note top of SensorController
+  Envia dados via WebSocket:
+  - /topic/sensor-data
+  - /topic/alerts
+  a cada 2s
+end note
+@enduml
