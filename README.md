@@ -5,7 +5,7 @@ Monitoramento inteligente de umidade, temperatura e luminosidade com alertas aut
 - [Diagrama de classe UML](https://lucid.app/lucidchart/8517f2f1-b970-4ed1-b0ce-36e6581e3479/view)
 
 ## 🚀 Tecnologias Utilizadas
-- **Java 17**
+- **Java 21**
 - **Spring Boot** (WebSocket, Scheduling)
 - **Lombok** (Redução de boilerplate)
 - **Maven** (Gerenciamento de dependências)
