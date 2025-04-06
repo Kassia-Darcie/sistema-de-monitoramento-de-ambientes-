@@ -3,6 +3,7 @@
 Monitoramento inteligente de umidade, temperatura e luminosidade com alertas automáticos
 - [Prótotipo do arduino](https://wokwi.com/projects/425598776942977025)
 - [Diagrama de classe UML](https://lucid.app/lucidchart/8517f2f1-b970-4ed1-b0ce-36e6581e3479/view)
+- [Protótipo no Figma](https://www.figma.com/design/fq2kdRA37NQsvlHHHGAU1G/Interface-dos-sensores?node-id=0-1&p=f&t=fyyWFGy0pTsQ2XJG-0)
 
 ## 🚀 Tecnologias Utilizadas
 - **Java 21**
